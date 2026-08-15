@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0]() (2026-08-15)
+
+### Features
+
+* Trust-policy conditions on the OIDC role: `allowed_audiences` (StringEquals on `aud`, default `["sts.amazonaws.com"]`) and `allowed_subject_patterns` (StringLike on `sub`, default `[]` = legacy behavior). Previously the assume-role policy accepted **any** token from the configured Jenkins issuer.
+
 ## [1.0.0]() (2025-07-10)
 
 Release module to Terraform Registry.

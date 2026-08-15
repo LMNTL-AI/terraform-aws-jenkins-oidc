@@ -1,4 +1,4 @@
-> **ARCHIVED — read-only mirror.** This module is developed in [`c0x12c/terraform-modules`](https://github.com/c0x12c/terraform-modules) and published to `terraform.c0x12c.com`. This repository is a frozen mirror that only backs legacy `registry.terraform.io/c0x12c/<name>/<provider>` versions. Do not open issues or PRs here.
+> **LMNTL-owned fork.** Re-homed from the contractor registry (`service-platform#1542`) and now developed here; diverged from the upstream `c0x12c` mirror as of v1.1.0. Consumers pin this repo by git ref (see Usages).
 
 # Terraform module AWS OIDC integration Jenkins
 
@@ -20,8 +20,7 @@ The module can manage the following:
 
 ```hcl
 module "jenkins_oidc" {
-  source  = "c0x12c/jenkins-oidc/aws"
-  version = "1.0.0"
+  source = "git::https://github.com/LMNTL-AI/terraform-aws-jenkins-oidc.git//?ref=<tag-or-sha>"
 
   role_name = "jenkins"
   url       = "https://jenkins.example.com/oidc"
@@ -73,6 +72,8 @@ Check out the [example](examples/default/README.md) for a full example of using 
 | Name                                                                                                                         | Description                                                                                                                 | Type                                                                                                                            | Default                                      | Required |
 |------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------|:--------:|
 | <a name="input_additional_thumbprints"></a> [additional\_thumbprints](#input\_additional\_thumbprints)                       | List of additional thumbprints to add to the thumbprint list. Reference: https://plugins.jenkins.io/oidc-provider/.         | `list(string)`                                                                                                                  | `[]`                                         |    no    |
+| <a name="input_allowed_audiences"></a> [allowed\_audiences](#input\_allowed\_audiences)                                     | Audience (aud) values the role trust policy accepts, matched with StringEquals. Defaults to the STS audience issued by the Jenkins oidc-provider plugin. An empty list omits the condition entirely. | `list(string)`                                                                                                                  | <pre>[<br/>  "sts.amazonaws.com"<br/>]</pre> |    no    |
+| <a name="input_allowed_subject_patterns"></a> [allowed\_subject\_patterns](#input\_allowed\_subject\_patterns)             | Subject (sub) patterns the role trust policy accepts, matched with StringLike (supports * and ?). With the Jenkins oidc-provider plugin defaults, sub is the Jenkins job URL. An empty list omits the condition, preserving the previous accept-any-token behavior. | `list(string)`                                                                                                                  | `[]`                                         |    no    |
 | <a name="input_client_id_list"></a> [client\_id\_list](#input\_client\_id\_list)                                             | List of client IDs (also known as audiences) for the IAM OIDC provider. Defaults to STS service if not values are provided. | `list(string)`                                                                                                                  | <pre>[<br/>  "sts.amazonaws.com"<br/>]</pre> |    no    |
 | <a name="input_create_provider"></a> [create\_provider](#input\_create\_provider)                                            | Whether to create a provider resource for migration purpose on existing provider.                                           | `bool`                                                                                                                          | `false`                                      |    no    |
 | <a name="input_custom_oidc_policy_statement"></a> [custom\_oidc\_policy\_statement](#input\_custom\_oidc\_policy\_statement) | Whether to create a custom oidc policy statement                                                                            | <pre>list(object({<br/>    effect    = string<br/>    actions   = list(string)<br/>    resources = list(string)<br/>  }))</pre> | `[]`                                         |    no    |

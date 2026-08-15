@@ -1,4 +1,8 @@
 locals {
+  # IAM condition keys for a web-identity federation use the provider URL
+  # without the scheme, e.g. "jenkins.example.com/oidc:aud".
+  oidc_condition_prefix = trimprefix(var.url, "https://")
+
   default_oidc_policy_statement = [
     {
       effect = "Allow"

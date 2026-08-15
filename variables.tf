@@ -61,3 +61,17 @@ variable "oidc_policy_description" {
   type        = string
   default     = null
 }
+
+# Trust conditions
+
+variable "allowed_audiences" {
+  description = "Audience (aud) values the role trust policy accepts, matched with StringEquals. Defaults to the STS audience issued by the Jenkins oidc-provider plugin. An empty list omits the condition entirely."
+  type        = list(string)
+  default     = ["sts.amazonaws.com"]
+}
+
+variable "allowed_subject_patterns" {
+  description = "Subject (sub) patterns the role trust policy accepts, matched with StringLike (supports * and ?). With the Jenkins oidc-provider plugin defaults, sub is the Jenkins job URL, e.g. https://jenkins.example.com/job/Org/job/repo/job/branch/. An empty list omits the condition, preserving the previous accept-any-token behavior."
+  type        = list(string)
+  default     = []
+}
