@@ -13,12 +13,12 @@ data "aws_iam_policy_document" "assume_role" {
     }
 
     dynamic "condition" {
-      for_each = length(var.allowed_audiences) > 0 ? [1] : []
+      for_each = length(local.allowed_audiences) > 0 ? [1] : []
 
       content {
         test     = "StringEquals"
         variable = "${local.oidc_condition_prefix}:aud"
-        values   = var.allowed_audiences
+        values   = local.allowed_audiences
       }
     }
 

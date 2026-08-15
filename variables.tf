@@ -15,6 +15,11 @@ variable "client_id_list" {
 variable "url" {
   description = "The URL of the identity provider. Corresponds to the iss claim."
   type        = string
+
+  validation {
+    condition     = startswith(var.url, "https://") && !endswith(var.url, "/")
+    error_message = "url must start with https:// and must not end with a trailing slash — it is used verbatim as the IAM condition-key prefix."
+  }
 }
 
 # Jenkins
@@ -65,13 +70,23 @@ variable "oidc_policy_description" {
 # Trust conditions
 
 variable "allowed_audiences" {
-  description = "Audience (aud) values the role trust policy accepts, matched with StringEquals. Defaults to the STS audience issued by the Jenkins oidc-provider plugin. An empty list omits the condition entirely."
+  description = "Audience (aud) values the role trust policy accepts, matched with StringEquals. Defaults (via null) to client_id_list so the trust condition cannot drift from what the provider accepts; set explicitly only to trust a subset of the provider's audiences."
   type        = list(string)
-  default     = ["sts.amazonaws.com"]
+  default     = null
+
+  validation {
+    condition     = var.allowed_audiences == null || (length(coalesce(var.allowed_audiences, ["-"])) > 0 && alltrue([for a in coalesce(var.allowed_audiences, []) : a != ""]))
+    error_message = "allowed_audiences must be null (inherit client_id_list) or a non-empty list of non-empty strings."
+  }
 }
 
 variable "allowed_subject_patterns" {
-  description = "Subject (sub) patterns the role trust policy accepts, matched with StringLike (supports * and ?). With the Jenkins oidc-provider plugin defaults, sub is the Jenkins job URL, e.g. https://jenkins.example.com/job/Org/job/repo/job/branch/. An empty list omits the condition, preserving the previous accept-any-token behavior."
+  description = "Subject (sub) patterns the role trust policy accepts, matched with StringLike (supports * and ?). With the Jenkins oidc-provider plugin defaults, sub is the Jenkins job URL, e.g. https://jenkins.example.com/job/Org/job/repo/job/branch/. Prefer wildcard patterns over CloudTrail-observed literals for versioned job paths (a tag job like .../job/v1.216.0/ changes every release). An empty list omits the condition, preserving the previous accept-any-token behavior."
   type        = list(string)
   default     = []
+
+  validation {
+    condition     = alltrue([for p in var.allowed_subject_patterns : p != "" && p != "*"])
+    error_message = "allowed_subject_patterns entries must be non-empty and must not be a bare \"*\" (which would re-open the trust policy to any token)."
+  }
 }

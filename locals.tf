@@ -3,6 +3,10 @@ locals {
   # without the scheme, e.g. "jenkins.example.com/oidc:aud".
   oidc_condition_prefix = trimprefix(var.url, "https://")
 
+  # Trust-condition audiences default to the provider's accepted audiences so
+  # the two cannot drift apart when a consumer overrides client_id_list.
+  allowed_audiences = coalesce(var.allowed_audiences, var.client_id_list)
+
   default_oidc_policy_statement = [
     {
       effect = "Allow"
