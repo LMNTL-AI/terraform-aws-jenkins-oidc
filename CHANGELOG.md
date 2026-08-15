@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.1.0 (2026-08-15)
+
+### Features
+
+* Trust-policy conditions on the OIDC role: `allowed_audiences` (StringEquals on `aud`; defaults via `null` to `client_id_list` so the role condition cannot drift from the provider's accepted audiences) and `allowed_subject_patterns` (StringLike on `sub`, default `[]` = legacy accept-any-token behavior until set). Previously the assume-role policy carried no conditions at all.
+* Input validation: `url` must be `https://` without a trailing slash (it is the condition-key prefix); subject patterns must be non-empty and not a bare `*`; explicit `allowed_audiences` must be a non-empty list.
+
 ## [1.0.0]() (2025-07-10)
 
 Release module to Terraform Registry.
